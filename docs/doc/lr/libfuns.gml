@@ -494,6 +494,7 @@
 .fnc _gettextposition           gr_gettp.gml    DOS QNX W GRAPH
 .fnc _gettextsettings           gr_getts.gml    DOS QNX W GRAPH
 .fnc _gettextwindow             gr_gettw.gml    DOS QNX W GRAPH
+.fnc gettid                     gettid.gml      DOS QXO   WIN32
 .fnc getuid                     getuid.gml          QXO
 .fnc _getvideoconfig            gr_getvc.gml    DOS QNX W GRAPH
 .fnc _getviewcoord              gr_getlc.gml    DOS QNX W GRAPH
@@ -1174,6 +1175,12 @@
 .fnc segread                    segread.gml     DOS QNX W WIN32
 .fnc select                     select.gml          QXO
 .fnc _selectpalette             gr_selp.gml     DOS QNX W GRAPH
+.fnc sem_destroy                sem_dest.gml    DOS     W WIN32
+.fnc sem_getvalue               sem_getv.gml    DOS     W WIN32
+.fnc sem_init                   sem_init.gml    DOS     W WIN32
+.fnc sem_post                   sem_post.gml    DOS     W WIN32
+.fnc sem_trywait                sem_tryw.gml    DOS     W WIN32
+.fnc sem_wait                   sem_wait.gml    DOS     W WIN32
 .fnc Send                       send.gml            QXO
 .fnc Sendfd                     sendfd.gml          QXO
 .fnc Sendfdmx                   sendfdmx.gml        QXO

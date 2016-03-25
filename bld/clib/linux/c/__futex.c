@@ -2,7 +2,8 @@
 *
 *                            Open Watcom Project
 *
-*    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
+*    Portions Copyright (c) 2016 Open Watcom Contributors. 
+*    All Rights Reserved.
 *
 *  ========================================================================
 *
@@ -24,18 +25,22 @@
 *
 *  ========================================================================
 *
-* Description:  WHEN YOU FIGURE OUT WHAT THIS FILE DOES, PLEASE
-*               DESCRIBE IT HERE!
+* Description:  Private implementation of the futex system call
 *
 ****************************************************************************/
 
 
-#ifndef _SEMAQNX_H_INCLUDED
-#define _SEMAQNX_H_INCLUDED
+#include "variety.h"
+#include "futex.h"
+#include "linuxsys.h"
 
-extern int __qsem_destroy( sem_t *p );
-extern int __qsem_init( sem_t *p, int i, unsigned j );
-extern int __qsem_wait( sem_t *p );
-extern int __qsem_post( sem_t *p );
+_WCRTLINK int __futex(volatile int *__address, int __operation, 
+                      int __value, void *__timeout)
+{
+syscall_res res;
 
-#endif
+    res = sys_call4( SYS_futex, (u_long)__address, (u_long)__operation, 
+                     (u_long)__value, (u_long)__timeout );
+
+    __syscall_return( int, res );
+}

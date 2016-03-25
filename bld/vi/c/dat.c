@@ -64,7 +64,7 @@ vi_rc ReadDataFile( const char *file, char **buffer, bool (*fn_alloc)(int), bool
     /*
      * get counts
      */
-    if( SpecialFgets( buff, sizeof( buff ) - 1, &gf ) < 0 ) {
+    if( SpecialFgets( buff, sizeof( buff ) - 1, &gf ) ) {
         SpecialFclose( &gf );
         return( ERR_INVALID_DATA_FILE );
     }
@@ -72,15 +72,16 @@ vi_rc ReadDataFile( const char *file, char **buffer, bool (*fn_alloc)(int), bool
     hasvals = fn_alloc( dcnt );
     buffdata = NULL;
     ptr = NULL;
-    size = 0;
 
     /*
      * read all tokens
+     *
+     * create list of tokens separated by '\0'
+     * list is terminated by two '\0' characters
      */
+    size = 0;
     for( i = 0; i < dcnt; i++ ) {
-
-        len = SpecialFgets( buff, sizeof( buff ) - 1, &gf );
-        if( len < 0 ) {
+        if( SpecialFgets( buff, sizeof( buff ) - 1, &gf ) ) {
             SpecialFclose( &gf );
             return( ERR_INVALID_DATA_FILE );
         }
@@ -90,15 +91,18 @@ vi_rc ReadDataFile( const char *file, char **buffer, bool (*fn_alloc)(int), bool
                 SpecialFclose( &gf );
                 return( ERR_INVALID_DATA_FILE );
             }
-            len = strlen( token );
         } else {
-            memcpy( token, buff, len + 1 );
+            strcpy( token, buff );
         }
-        len++;
+        // add space for token terminator
+        len = strlen( token ) + 1;
+        // add space for list terminator
         buffdata = MemReAlloc( buffdata, size + len + 1 );
-        memcpy( &buffdata[size], token, len );
+        // copy token with terminator
+        memcpy( buffdata + size, token, len );
         size += len;
-        buffdata[size] = 0;
+        // write list terminator
+        buffdata[size] = '\0';
         if( hasvals ) {
             ptr = GetNextWord1( ptr, token );
             if( *token == '\0' ) {

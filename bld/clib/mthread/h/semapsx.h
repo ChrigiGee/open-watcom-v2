@@ -2,7 +2,9 @@
 *
 *                            Open Watcom Project
 *
-*    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
+*    Portions Copyright (c) 1983-2002 Sybase, Inc. 
+*    Portions Copyright (c) 2016 Open Watcom Contributors. 
+*    All Rights Reserved.
 *
 *  ========================================================================
 *
@@ -24,62 +26,21 @@
 *
 *  ========================================================================
 *
-* Description:  Platform independent abort() implementation.
+* Description:  Semaphore function wrappers for POSIX (QNX, Linux) systems
 *
 ****************************************************************************/
 
 
-#include "variety.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "rtdata.h"
-#include "exitwmsg.h"
-#include <signal.h>
-#include <unistd.h>
+#ifndef _SEMA_POSIX_H_INCLUDED
+#define _SEMA_POSIX_H_INCLUDED
 
-
-void    (*_RWD_abort)( void ) = __terminate;
-
-
-// TODO: Use the QNX code once we get signal handling working properly
-
-#if defined(__QNX__)
-/*
- * abort() the u**x way
- */
-#include "initfini.h"
-
-_WCRTLINK void abort( void )
-{
-    struct sigaction    oact;
-    sigset_t            mask;
-
-    sigaction( SIGABRT, NULL, &oact );
-    if( oact.sa_handler == SIG_DFL ) {
-                                /* '0' is not the right value here */
-        __FiniRtns( 0, 255 );   /* get the I/O system shut down */
-    }
-    sigfillset( &mask );
-    sigdelset( &mask, SIGABRT );
-    sigprocmask( SIG_SETMASK, &mask, (sigset_t *)NULL );
-    raise( SIGABRT );
-    signal( SIGABRT,SIG_DFL );
-    raise( SIGABRT );
-    __terminate();
-}
-#else
-
-_WCRTLINK void abort( void )
-{
-    if( _RWD_abort != __terminate ) {
-        (*_RWD_abort)();
-    }
-    __terminate();                          /* 23-may-90 */
-}
-
+#ifdef __LINUX__
+#include <semaphore.h>
 #endif
 
-void __terminate( void )
-{
-    __fatal_runtime_error( "ABNORMAL TERMINATION", EXIT_FAILURE );
-}
+extern int __posix_sem_destroy( sem_t *p );
+extern int __posix_sem_init( sem_t *p, int i, unsigned j );
+extern int __posix_sem_wait( sem_t *p );
+extern int __posix_sem_post( sem_t *p );
+
+#endif
